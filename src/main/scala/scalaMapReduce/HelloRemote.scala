@@ -2,32 +2,35 @@ package scalaMapReduce
 
 import akka.actor._
 import common._
+import javaMapReduce.JobConf;
+import rapture.io._
+import strategy.throwExceptions
 
-object HelloRemote extends App  {
+object JobTrackerApp extends App  {
   def printActor(s: ActorRef){
     println(s.path.toString)
     println(s.path.address.toString)
   }
-
-  val system = ActorSystem("HelloRemoteSystem", Config.JobTrackerConfig)
-  val remoteActor = system.actorOf(Props[RemoteActor], name = "RemoteActor")
-  printActor(remoteActor)
-  remoteActor ! Message("The RemoteActor is alive")
+//  Http / "rapture.io" / "welcome.txt" > File / "home" / "liang" / "welcome.txt"
+  File / "home" / "liang" / "welcome.txt" > Socket("localhost", 6789)
+  // val system = ActorSystem("JobTrackerSystem", Config.JobTrackerConfig)
+  // val remoteActor = system.actorOf(Props[JobTrackerActor], name = "JobTrackerActor")
+  // printActor(remoteActor)
+  // remoteActor ! Message("The JobTracker is alive")
 }
 
 
-class RemoteActor extends Actor {
+class JobTrackerActor extends Actor {
   def receive = {
     case Message(msg) =>
-        println(s"RemoteActor received message '$msg'")
+        println(s"JobTracker received message '$msg'")
         val s = sender
         printActor(s)
-    case st: String =>
-        println("RemoteActor received message " + st)
-        val s = sender
-        printActor(s)
+        sender ! Message("Hello from the JobTracker")
+    case jc: JobConf => 
+      println("LocalActor received message: JobConf")
     case _ => 
-        println("RemoteActor got something unexpected.")
+        println("JobTracker got something unexpected.")
   }
 
   def printActor(s: ActorRef){
@@ -36,8 +39,4 @@ class RemoteActor extends Actor {
     println(s.path.address.host)
     println(s.path.address.port)
   }
-
-
 }
-
-
