@@ -77,6 +77,10 @@ object Util{
 		arrRet
 	}
 
+	/*
+	 * Given an instance, getPartition finds the partition number for the 
+	 * instance.
+	 */
 	def getPartition(aInst: Instance) = {
 		if(aInst != null){
 
@@ -100,9 +104,11 @@ object Util{
 
 			val arrDouble = Config.arrDouble;
 
+			/* 
 			 * Current partitioning scheme only supports two and three dimensional cases.
 			 * if the returned value is -1, it denotes that sth wrong happened in the get partition number Process.
-			 
+			 */
+
 			if(dim == 2){
 
 				val angles = arrDouble(0);
@@ -113,13 +119,12 @@ object Util{
 
 				val anglesX = arrDouble(0);
 				var partitionX = -1;
-				for{i<-0 until anglesX.length; if anglesX.get(i) > angle[0]}
+				for{i<-0 until anglesX.length; if anglesX(i) > angle(0)}
 						partitionX = i;
 
 				val anglesY = arrDouble(1);
-				int partitionY = -1;
-				for(int i=0; i<anglesY.size(); i++){
-					if(anglesX.get(i) > angle[1])
+				var partitionY = -1;
+				for{i<-0 until anglesY.length ; if anglesX(i) > angle(1) }{
 						partitionY = i;
 				}
 				if(partitionX == -1 || partitionY == -1)
@@ -130,7 +135,7 @@ object Util{
 				}
 			}
 		}
-		return -1;
+		-1;
 	}
 
 

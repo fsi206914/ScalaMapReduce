@@ -1,5 +1,6 @@
 package probSkyline.dataStructure 
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.HashMap
 
 class Instance(val objID: Int, val instID: Int, val prob: Double, val dim: Int)extends Serializable{
 	val pt: Point = new Point(dim)
@@ -39,4 +40,18 @@ class Item(val objID: Int) extends Serializable{
 		max = aMax
 	}
 
+}
+
+class PartitionInfo(val splitNo: Int) extends Serializable{
+
+	val min = HashMap[Int, Point]();
+	val max = HashMap[Int, Point]();
+
+	def addMin(objID: Int, onePoint: Point){
+		min.update(objID,onePoint);
+	}
+
+	def addMax(objID: Int, onePoint: Point){
+		max.update(objID,onePoint);
+	}
 }
