@@ -82,6 +82,7 @@ object Util{
 	 * instance.
 	 */
 	def getPartition(aInst: Instance) = {
+		var ret = -1;
 		if(aInst != null){
 
 			/*
@@ -108,12 +109,10 @@ object Util{
 			 * Current partitioning scheme only supports two and three dimensional cases.
 			 * if the returned value is -1, it denotes that sth wrong happened in the get partition number Process.
 			 */
-
 			if(dim == 2){
-
 				val angles = arrDouble(0);
-				for{i<-0 until angles.length; if angles(i) > angle(0) } i;
-				-1;
+				for(i<-(0 until angles.length).reverse)
+				  if (angles(i) > angle(0)) ret = i;
 			}
 			else if(dim == 3){
 
@@ -128,15 +127,13 @@ object Util{
 						partitionY = i;
 				}
 				if(partitionX == -1 || partitionY == -1)
-					-1;
+					ret = -1;
 				else{
-					val ret = partitionX * anglesX.length + partitionY;
-					ret;
+					ret = partitionX * anglesX.length + partitionY;
 				}
 			}
 		}
-		-1;
+		ret;
 	}
-
 
 }

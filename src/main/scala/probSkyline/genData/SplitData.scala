@@ -21,7 +21,7 @@ object SplitData extends App{
 	 * from file to itemList, which represents the list of items.
 	 */
 	var itemList = Util.getItemList(fileName)
-
+	println("The size of items = "+ itemList.length)
 	/*
 	 * write instance to each file based on angle partitioning scheme.
 	 * first, we create files, each of which corresponds a partition.
@@ -31,12 +31,12 @@ object SplitData extends App{
 		TIWs(i) = new InstanceWriter(i.toString, "part")
 
 	//Based on the partition return result, we put instance to that file.:w
-	for(
-		aItem <- itemList;
-		aInst <- aItem.instances){
+	for(aItem <- itemList){
+		for(aInst <- aItem.instances){
 			val ret_area = Util.getPartition(aInst);
 			TIWs(ret_area).writeInstance(aInst);
 		}
+	}
 
 	// after writing finishes, it should close the file.
 	for(i<-0 until splitNum)
@@ -62,7 +62,7 @@ object SplitData extends App{
 	import java.io.ObjectOutputStream;
 	try{
 
-		val fileOut = new FileOutputStream( "MAX_MIN" );
+		val fileOut = new FileOutputStream( "./part/MAX_MIN" );
 		var outStream = new ObjectOutputStream(fileOut);
 		outStream.writeObject(outputLists);
 		outStream.flush();

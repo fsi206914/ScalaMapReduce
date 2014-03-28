@@ -16,14 +16,18 @@ class InstanceWriter(val fileName: String, val folderName: String){
 
 	def outputFile = {
 		if(folderName == "") "./"+fileName;
-		else "./" + folderName + "/" + fileName;
+		else{
+			val folder = new File(folderName);
+			if(!folder.exists()) folder.mkdir();
+			"./" + folderName + "/" + fileName;
+		}
 	}
 
 	val bw = new BufferedWriter(new FileWriter(outputFile));
 
   def write(a_string: String){
   	try{
-      bw.write(a_string);
+      bw.write(a_string + "\n");
     }catch{
 			case ioe: IOException => ioe.printStackTrace()	
 		}
