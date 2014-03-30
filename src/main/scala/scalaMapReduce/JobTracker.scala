@@ -19,13 +19,14 @@ object JobTrackerApp extends App  {
 
 class JobTrackerActor extends Actor {
   def receive = {
-    case Message(msg) =>
-        println(s"JobTracker received message '$msg'")
+    case "RequestJobID" =>
+        println("JobTracker received message RequestJobID")
         val s = sender
         printActor(s)
-        sender ! Message("Hello from the JobTracker")
+        sender ! 123
     case jc: JobConf => 
-      println("LocalActor received an object JobConf")
+      println("jobTrackerActor received an object JobConf")
+      submitJob(jc)
     case _ => 
         println("JobTracker got something unexpected.")
   }
@@ -36,6 +37,11 @@ class JobTrackerActor extends Actor {
     println(s.path.address.host)
     println(s.path.address.port)
   }
+
+  def submitJob(jc: JobConf){
+    
+  }
+
 }
 
 class JobTracker{

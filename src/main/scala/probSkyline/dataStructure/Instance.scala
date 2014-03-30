@@ -3,6 +3,7 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.HashMap
 
 class Instance(val objID: Int, val instID: Int, val prob: Double, val dim: Int)extends Serializable{
+	var instSkyProb = 0.0
 	val pt: Point = new Point(dim)
 	
 	def checkDomination(other: Instance) = pt.checkDomination(other.pt)
@@ -24,6 +25,7 @@ class Instance(val objID: Int, val instID: Int, val prob: Double, val dim: Int)e
 
 class Item(val objID: Int) extends Serializable{
 	
+	var objSkyProb = 0.0
 	val instances = ListBuffer[Instance]()
 	var min: Point = null
 	var max: Point = null

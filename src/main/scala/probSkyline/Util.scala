@@ -16,27 +16,6 @@ object Util{
 	val srcName = CC.getString("srcName");
 	val dim = CC.getInt("dim")
 
-	/*
-	 * get the whole map data[Int, item], filter objects whose item is still in 
-	 * objectSet, which is returned by the first phase.
-	 */
-	// def getItemListFilter(objSet: HashSet[Int]) ={
-
-	// 	var aMap = new HashMap[Integer, item]();
-	// 	for(line <- Source.fromFile(fileName).getLines()){
-
-	// 		val curr = stringToInstance(line);
-	// 		if(objSet.contains(curr.objectID)){
-	// 			if(!aMap.contains(curr.objectID)){
-	// 				val aItem = new item(curr.objectID);              
-	// 				aMap.update(curr.objectID, aItem);
-	// 			}
-	// 			aMap(curr.objectID).addInstance(curr);
-	// 		}
-	// 	}
-	// 	val itemList = aMap.values.toList
-	// 	itemList
-	// }
 
 	/*
 	 * get the whole map data[Int, item], filter objects whose item is still in 
@@ -58,7 +37,9 @@ object Util{
 		itemList
 	}
 
-
+	/*
+	 * given a string, stringToInstance creates an instance.
+	 */
 	def stringToInstance(line: String) = {
 		val div = line.split(" ");
 		var inst: Instance = null

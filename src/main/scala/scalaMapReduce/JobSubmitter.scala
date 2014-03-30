@@ -8,79 +8,59 @@ import java.util.concurrent.TimeUnit;
 import java.net._
 import java.io._
 
-object JobSubmitterApp extends App {
+class Job(val jc:JobConf){
 
-  implicit val system = ActorSystem("JobSubmitterSystem", Config.JobSubmitterConfig)
-  val localActor = system.actorOf(Props[JobSubmitterActor], name = "JobSubmitterActor")  // the local actor
-  localActor ! Start      
-
-  // start the action
-
-// 	try {
-// 			val serverSocket = new ServerSocket(6789)
-// 			println("Receiving input through socket...")
-// 			while(true) {
-// 				val clientSocket = serverSocket.accept()
-// 				println("accept")
-// /*       val in = new BufferedInputStream(clientSocket.getInputStream());*/
-// 				//val out = new BufferedOutputStream(new FileOutputStream("newWelcome"));
-
-// 				//var c = in.read() 
-// 				//while (c != -1) {
-// 					//println("sdfsd");
-// 					//out.write(c);
-// 					//c = in.read()
-// 				//}
-// 				//out.flush();
-// 				//in.close();
-// 				/*out.close();*/
-// 			}
-// 	} catch {
-// 		case e: IOException =>
-// 			println("Exception caught when trying to listen on port 6789 or listening for a connection")
-// 			println(e.getMessage)
-// 			e.printStackTrace()
-// 	}
+	def run(){
+	  implicit val system = ActorSystem("JobSubmitterSystem", Config.JobSubmitterConfig)
+	  val localActor = system.actorOf(Props(new JobSubmitterActor(jc)), name = "JobSubmitterActor") 
+		localActor ! Start
+	}
 }
 
-class JobSubmitterActor extends Actor {
+object JobApp extends App {
+
+   val ja = new Job(new JobConf())
+   ja.run()
+}
+
+
+
+class JobSubmitterActor(jconf: JobConf) extends Actor {
 
 	import context._
-		// create the remote actor
-		implicit val system = ActorSystem("JobSubmitterSystem", Config.JobSubmitterConfig)
-		val remote = context.actorSelection("akka.tcp://JobTrackerSystem@127.0.0.1:7890/user/JobTrackerActor")
-		var counter = 0
+	// create the remote actor
+	val remote = context.actorSelection("akka.tcp://JobTrackerSystem@127.0.0.1:10021/user/JobTrackerActor")
 
-		def receive = {
-			case Start =>
+	def receive = beforeStart
 
-				// new Thread(new Runnable(){
-				// 	def run() {
-				// 		system.scheduler.schedule(Duration.create(1000, TimeUnit.MILLISECONDS), Duration.create(1000, TimeUnit.MILLISECONDS),
-				// 			remote, Message("foo"));
-				// 	}
-				// }).start;
+	def beforeStart: Receive = {
 
-				remote ! new JobConf()
-				self ! "stop"
-			case "stop" =>
-				println("stopping...")
-				context.stop(self)
+		case Start =>
+			println("JobSubmitter(BeforeStart) started working...")
+			context.become(started)
+		  remote ! "RequestJobID"
 
-			case Message(msg) => 
-				println(s"JobSubmitterActor received message: '$msg'")
-				if (counter < 5) {
-					sender ! End
-					counter += 1
-				}
+		case _ =>
+			println("JobSubmitterActor(BeforeStart) got something unexpected.")
+	}
 
-			case jc: JobConf => 
-				println("JobSubmitterActor received message: JobConf")
-				sender ! Message("succeed received")
 
-			case _ =>
-				println("JobSubmitterActor got something unexpected.")
-		}
+	def started: Receive = {
+
+		case id: Int =>
+			println("JobSubmitter(started) started working...")
+			println(id)
+		  remote ! jconf
+		  self ! "stop"
+
+		case "stop" =>
+			println("stopping...")
+			context.system.shutdown()
+
+		case _ =>
+			println("JobSubmitterActor(started) got something unexpected.")
+	}
+
 
 	def printActor(s: ActorRef){
 		println(s.path.toString)
