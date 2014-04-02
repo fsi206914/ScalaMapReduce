@@ -15,7 +15,7 @@ class InstanceWriter(val fileName: String, val folderName: String){
 	}
 
 	def outputFile = {
-		if(folderName == "") "./"+fileName;
+		if(folderName == "") fileName;
 		else{
 			val folder = new File(folderName);
 			if(!folder.exists()) folder.mkdir();
@@ -23,6 +23,7 @@ class InstanceWriter(val fileName: String, val folderName: String){
 		}
 	}
 
+	println("output File = " + outputFile)
 	val bw = new BufferedWriter(new FileWriter(outputFile));
 
   def write(a_string: String){

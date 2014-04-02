@@ -9,7 +9,7 @@ public class JobMeta {
   }
 
   // the input blocks after splitting the input data
-  public class InputBlock {
+  public static class InputBlock {
     private String filePath;
 
     private long offset;

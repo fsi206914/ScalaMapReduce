@@ -23,8 +23,6 @@ object JobApp extends App {
    ja.run()
 }
 
-
-
 class JobSubmitterActor(jconf: JobConf) extends Actor {
 
 	import context._
@@ -49,9 +47,17 @@ class JobSubmitterActor(jconf: JobConf) extends Actor {
 
 		case id: Int =>
 			println("JobSubmitter(started) started working...")
-			println(id)
+			if( jconf == null || !jconf.isValid())
+				println("invalid job configuration.")
+
+			// 1. request id from jobtracker.
+			jconf.setJobID(id)
+			if(jconf.getJobName().length() == 0)
+				jconf.setJobName("Job "+ id.toString)
+
+			// 2. Send the job to the jobtracker.
 		  remote ! jconf
-		  self ! "stop"
+			self ! "stop"
 
 		case "stop" =>
 			println("stopping...")
