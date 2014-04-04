@@ -10,6 +10,8 @@ object Config {
   private val root = ConfigFactory.load()
   val JobTrackerConfig = root.getConfig("JobTrackerSystem")
   val JobSubmitterConfig = root.getConfig("JobSubmitterSystem")
+  val TaskTracker1Config = root.getConfig("TaskTracker1System")
+
 
   val ClusterConfig = root.getConfig("ClusterConfig")
   val arrDouble = computeArrDouble()
