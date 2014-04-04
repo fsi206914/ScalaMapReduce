@@ -9,7 +9,6 @@ import java.io._;
 import scala.collection.mutable.StringBuilder;
 
 
-
 class JobTracker{
 
   def submitJob(newjob: JobMeta){
@@ -94,7 +93,6 @@ class JobTracker{
     else null
   }
 
-
   def deleteTaskTracker(ttname: String){
     if(ttname != null && JobTracker.tasktrackers.containsKey(ttname)) 
       JobTracker.tasktrackers.remove(ttname);
@@ -102,6 +100,11 @@ class JobTracker{
 
 }
 
+
+/*
+ * Companion object to store static variables, since JobTracker is 
+ * only created once.
+ */
 object JobTracker{
 
   val JOB_MAPPER_OUTPUT_PREFIX = "mapper_output_job_";
