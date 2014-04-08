@@ -37,6 +37,27 @@ object Util{
 		itemList
 	}
 
+
+	/*
+	 * get the whole map data[Int, item], filter objects whose item is still in 
+	 * objectSet, which is returned by the first phase.
+	 */
+	def getItemMap(fileName: String) = {
+
+		var aMap = new HashMap[Integer, Item]();
+		for(line <- Source.fromFile(fileName).getLines()){
+
+			val curr = stringToInstance(line);
+			if(!aMap.contains(curr.objID)){
+				val aItem = new Item(curr.objID);              
+				aMap.update(curr.objID, aItem);
+			}
+			aMap(curr.objID).addInstance(curr);
+		}
+		aMap
+	}
+
+
 	/*
 	 * given a string, stringToInstance creates an instance.
 	 */

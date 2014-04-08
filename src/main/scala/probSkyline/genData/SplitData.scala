@@ -43,7 +43,6 @@ object SplitData extends App{
 		TIWs(i).close()
 
 
-
 	/*
 	 * find left bottom and right top extreme value of every item, and add to outputList.
 	 * first, we create files, each of which corresponds a partition.
@@ -65,9 +64,11 @@ object SplitData extends App{
 		val fileOut = new FileOutputStream( "./part/MAX_MIN" );
 		var outStream = new ObjectOutputStream(fileOut);
 		outStream.writeObject(outputLists);
+
 		outStream.flush();
 		outStream.close();
 		fileOut.close();
+
 	}catch{case e: IOException =>  e.printStackTrace(); }
 
 

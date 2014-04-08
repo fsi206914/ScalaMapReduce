@@ -30,7 +30,7 @@ class TaskTrackerActor(val tt: TaskTracker) extends Actor {
 
     case Start =>
       println("TaskTrackerActor begin working")
- //     run();
+      run();
     case "RequestJobID" =>
       println("JobTracker received message RequestJobID")
       sender ! 123
@@ -89,6 +89,7 @@ class TaskTrackerActor(val tt: TaskTracker) extends Actor {
               val pkg = new TaskTrackerUpdatePkg(tt.taskTrackerName, TaskTracker.NUM_OF_MAPPER_SLOTS - tt.mapperCounter,
                         TaskTracker.NUM_OF_REDUCER_SLOTS - tt.reducerCounter, "12",
                         taskList, 123);
+              println("periodically sending taskStatusUpdater to taskTracker")
               remote ! pkg;
             }
           }
@@ -96,7 +97,9 @@ class TaskTrackerActor(val tt: TaskTracker) extends Actor {
       }
 
       });
-
+      taskStatusUpdater.setDaemon(true);
+      val schFutureUpdater = schExec.scheduleAtFixedRate(taskStatusUpdater, 0,
+          2, TimeUnit.SECONDS);
   }
 
 }

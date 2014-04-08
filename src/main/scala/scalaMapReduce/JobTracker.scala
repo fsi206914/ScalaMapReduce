@@ -98,6 +98,10 @@ class JobTracker{
       JobTracker.tasktrackers.remove(ttname);
   }
 
+  def updateTaskStatus(ttup: TaskTrackerUpdatePkg){
+
+  }
+
 }
 
 

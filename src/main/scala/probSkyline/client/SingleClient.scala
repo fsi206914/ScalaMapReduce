@@ -5,7 +5,7 @@ import scalaMapReduce.Config;
 import scala.collection.mutable.ListBuffer
 import java.io.File
 import probSkyline.query._
-
+import probSkyline.Util
 
 /**
  * SingleClient reads data from the folder part as the source,
@@ -25,19 +25,35 @@ object SingleClient extends App{
 	/**
 	 * some variables initialization of preprocess
 	 */
+	// if(argStr == "single"){
+	// 	val nqClient = new NaiveQuery(CC.getString("testArea"))
+	// 	nqClient.compProb(nqClient.getItemList)
+	// }
+	// else{
+	// 	val splitNum = CC.getInt("splitNum");
+	// 	val nqClient = new NaiveQuery(CC.getString("testArea"))
+	// 	for(i<- 0 until splitNum){
+	// 		nqClient.changeTestArea(i.toString)
+	// 		nqClient.compProb(nqClient.getItemList)
+	// 	}
+	// }
+
+
 	if(argStr == "single"){
-		val nqClient = new NaiveQuery(CC.getString("testArea"))
-		nqClient.compProb(nqClient.getItemList)
+		val tArea = CC.getString("testArea");
+		val oqClient = new OptimizedQuery(tArea, OptimizedQuery.getItemMap(tArea) );
+		oqClient.readMAXMIN();
+		oqClient.rule1();
+		oqClient.rule2();
 	}
 	else{
-		val splitNum = CC.getInt("splitNum");
-		val nqClient = new NaiveQuery(CC.getString("testArea"))
-		for(i<- 0 until splitNum){
-			nqClient.changeTestArea(i.toString)
-			nqClient.compProb(nqClient.getItemList)
-		}
+		// val splitNum = CC.getInt("splitNum");
+		// val nqClient = new NaiveQuery(CC.getString("testArea"))
+		// for(i<- 0 until splitNum){
+		// 	nqClient.changeTestArea(i.toString)
+		// 	nqClient.compProb(nqClient.getItemList)
+		// }
 	}
-
 
 	/**
 	 * get the files uner a folder recursively.

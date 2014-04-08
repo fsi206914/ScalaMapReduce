@@ -76,7 +76,6 @@ class TaskTracker(val taskTrackerName: String, val rPort: Int){
 
   }
 
-
 }
 
 /*
