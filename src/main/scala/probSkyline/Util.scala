@@ -37,6 +37,27 @@ object Util{
 		itemList
 	}
 
+
+	/*
+	 * get the whole map data[Int, item], filter objects whose item is still in 
+	 * objectSet, which is returned by the first phase.
+	 */
+	def getItemMap(fileName: String) = {
+
+		var aMap = new HashMap[Integer, Item]();
+		for(line <- Source.fromFile(fileName).getLines()){
+
+			val curr = stringToInstance(line);
+			if(!aMap.contains(curr.objID)){
+				val aItem = new Item(curr.objID);              
+				aMap.update(curr.objID, aItem);
+			}
+			aMap(curr.objID).addInstance(curr);
+		}
+		aMap
+	}
+
+
 	/*
 	 * given a string, stringToInstance creates an instance.
 	 */
@@ -99,18 +120,20 @@ object Util{
 
 				val anglesX = arrDouble(0);
 				var partitionX = -1;
-				for{i<-0 until anglesX.length; if anglesX(i) > angle(0)}
+
+				for{i<- anglesX.length-1 to (0, -1); if anglesX(i) > angle(0)}
 						partitionX = i;
 
 				val anglesY = arrDouble(1);
 				var partitionY = -1;
-				for{i<-0 until anglesY.length ; if anglesX(i) > angle(1) }{
+				for{i<- anglesY.length-1 to (0, -1); if anglesY(i) > angle(1) }{
 						partitionY = i;
 				}
+
 				if(partitionX == -1 || partitionY == -1)
 					ret = -1;
 				else{
-					ret = partitionX * anglesX.length + partitionY;
+					ret = partitionY * anglesX.length + partitionX;
 				}
 			}
 		}

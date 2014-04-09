@@ -6,45 +6,8 @@ import javaMapReduce._;
 import java.util._;
 import java.io._;
 
-import scala.collection.mutable.StringBuilder
+import scala.collection.mutable.StringBuilder;
 
-object JobTrackerApp extends App  {
-//  Http / "rapture.io" / "welcome.txt" > File / "home" / "liang" / "welcome.txt"
-//  File / "home" / "liang" / "welcome.txt" > Socket("localhost", 6789)
-
-  val system = ActorSystem("JobTrackerSystem", Config.JobTrackerConfig)
-  val jtActor = system.actorOf(Props(new JobTrackerActor(new JobTracker())) , name = "JobTrackerActor")
-}
-
-
-class JobTrackerActor(val jt: JobTracker) extends Actor {
-  def receive = {
-    case "RequestJobID" =>
-      println("JobTracker received message RequestJobID")
-      val s = sender
-      printActor(s)
-      sender ! 123
-    case jconf: JobConf => 
-      println("jobTrackerActor received an object JobConf")
-      submitJob(jconf)
-    case _ => 
-        println("JobTracker got something unexpected.")
-  }
-
-  def printActor(s: ActorRef){
-    println(s.path.toString)
-    println(s.path.address.toString)
-    println(s.path.address.host)
-    println(s.path.address.port)
-  }
-
-  def submitJob(jconf: JobConf){
-    val newJob = new JobMeta(jconf);
-    jt.submitJob(newJob);
-    jt.distributeTasks();
-  }
-
-}
 
 class JobTracker{
 
@@ -77,6 +40,25 @@ class JobTracker{
       newjob.addMapperTask(taskid);
     }
 
+    for(i<- 0 until newjob.getReducerNum()){
+      val taskid = this.requestTaskId();
+      val rinfo = new ReducerTaskInfo(newjob.getJobId(), taskid, i, jobMapperOutputDirPath.toString(),
+              newjob.getReducerClassName(), newjob.getOutputFormatClassName(),
+              newjob.getOutputPath());
+      val rtask = new TaskMeta(taskid, newjob.getJobId(), rinfo, new TaskProgress(taskid,
+              TaskMeta.TaskType.REDUCER));
+
+      reduceTasks.put(taskid, rtask);
+      newjob.addReducerTask(taskid);
+    }
+
+    // submit these tasks into the system
+    JobTracker.mapTasks.putAll(mapTasks.asInstanceOf[ Map[Integer, TaskMeta] ]  );
+    JobTracker.reduceTasks.putAll(reduceTasks.asInstanceOf[ Map[Integer, TaskMeta] ]);
+    JobTracker.mapTasksQueue.addAll(mapTasks.values());
+    JobTracker.reduceTasksQueue.addAll(reduceTasks.values());
+    JobTracker.jobs.put(newjob.getJobId(), newjob);
+    newjob.setStatus(JobMeta.JobStatus.INPROGRESS)
   }
 	
   def requestTaskId() = {
@@ -88,8 +70,45 @@ class JobTracker{
 
   }
 
+  /**
+   * Register a new tasktracker in this jobtracker
+   */
+  def registerTaskTracker(tt: TaskTrackerMeta) = {
+    if (tt == null)false;
+
+    if (JobTracker.tasktrackers.containsKey(tt.getTaskTrackerName())) {
+      println("The TaskTracker \"" + tt.getTaskTrackerName() + "\" already exist.");
+      false;
+    } else {
+      System.err.println("Register a new tasktracker : " + tt.getTaskTrackerName());
+      JobTracker.tasktrackers.put(tt.getTaskTrackerName(), tt);
+      true;
+    }
+  }
+
+
+  def getTaskTracker(id: String) = {
+    if(JobTracker.tasktrackers.containsKey(id))
+      JobTracker.tasktrackers.get(id);
+    else null
+  }
+
+  def deleteTaskTracker(ttname: String){
+    if(ttname != null && JobTracker.tasktrackers.containsKey(ttname)) 
+      JobTracker.tasktrackers.remove(ttname);
+  }
+
+  def updateTaskStatus(ttup: TaskTrackerUpdatePkg){
+
+  }
+
 }
 
+
+/*
+ * Companion object to store static variables, since JobTracker is 
+ * only created once.
+ */
 object JobTracker{
 
   val JOB_MAPPER_OUTPUT_PREFIX = "mapper_output_job_";
@@ -98,4 +117,24 @@ object JobTracker{
   var currentMaxTaskId = (math.random*1000).toInt;
 
   def getTASK_MAPPER_OUTPUT_PREFIX() = TASK_MAPPER_OUTPUT_PREFIX;
+
+  val mapTasks: Map[Integer, TaskMeta] = Collections.synchronizedMap(new HashMap[Integer, TaskMeta]());
+  val reduceTasks: Map[Integer, TaskMeta] = Collections.synchronizedMap(new HashMap[Integer, TaskMeta]());
+  val jobs: Map[Integer, JobMeta] = Collections.synchronizedMap(new HashMap[Integer, JobMeta]());
+  
+
+  val mapTasksQueue = new PriorityQueue[TaskMeta](10,
+
+            new Comparator[TaskMeta]() {
+              def compare(o1: TaskMeta, o2: TaskMeta) = o1.getJobID() - o2.getJobID();
+      });
+
+  val reduceTasksQueue = new PriorityQueue[TaskMeta](10,
+
+            new Comparator[TaskMeta]() {
+              def compare(o1: TaskMeta, o2: TaskMeta) = o1.getJobID() - o2.getJobID();
+      });
+
+  val tasktrackers = Collections.synchronizedMap(new HashMap[String, TaskTrackerMeta]());
+  
 }
