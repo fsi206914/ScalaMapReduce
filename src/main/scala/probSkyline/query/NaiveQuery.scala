@@ -35,6 +35,7 @@ class NaiveQuery(var area: String){
 	 */
 	def compProb(itemList: List[Item]){
 		println(" access the naive method of computing. The size of items = "+ itemList.length);
+		var satisfied = 0;
 		for(aItem <- itemList){
 			var objSkyProb = 0.0
 			for(aInst <- aItem.instances){
@@ -49,7 +50,9 @@ class NaiveQuery(var area: String){
 				objSkyProb += aInst.prob * aInst.instSkyProb
 			}
 			aItem.objSkyProb = objSkyProb
+			if(objSkyProb > 0.01) satisfied += 1;
 		}
+		println(satisfied + " items remained in the partition");
 	}
 
 

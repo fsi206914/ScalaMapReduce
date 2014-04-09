@@ -72,7 +72,6 @@ class OptimizedQuery(var area: String, val itemMap: HashMap[Integer, Item]){
 		}
 	}
 
-
 	def rule1(){
 		if(outputLists != null){
 			val areaInfo = outputLists(area.toInt);
@@ -90,7 +89,6 @@ class OptimizedQuery(var area: String, val itemMap: HashMap[Integer, Item]){
 	  removeAndGenerateNewList();
 	}
 
-
 	def removeAndGenerateNewList(){
 		println("before prune 1, the size of objects is " + itemMap.size);
 		for( (objID, item) <- itemMap if item.potentialSkyline == true)
@@ -98,13 +96,17 @@ class OptimizedQuery(var area: String, val itemMap: HashMap[Integer, Item]){
 		println("after removing redundant items, the size decreases to " + cleanItemMap.size);
 	}
 
-
 	def rule2(){
 		for( (objID, item)<- cleanItemMap; instance<- item.instances){
-			for( (idMax, ptMax) <-  outputLists(area.toInt).max  
+			for( (idMax, ptMax) <- outputLists(area.toInt).max  
 				   if ptMax.checkDomination(instance.pt) == true
 				 )instance.instPotentialSkyline = true;
 		}
 	}
+
+	def rule3(){
+
+	}
+
 
 }
