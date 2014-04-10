@@ -61,14 +61,30 @@ class JobTracker{
     newjob.setStatus(JobMeta.JobStatus.INPROGRESS)
   }
 	
+
   def requestTaskId() = {
     JobTracker.currentMaxTaskId += 1
     JobTracker.currentMaxTaskId-1
   }
 	
-  def distributeTasks(){
 
+  def distributeTasks(){
+    val schestrategies = this.scheduleTask();
+    if(schestrategies != null){
+      for( (taskID, ttmName) <- schestrategies ){
+        var task: TaskMeta = null;
+        if(JobTracker.mapTasks.containsKey(taskID))
+          task = JobTracker.mapTasks.get(taskID);
+        if(JobTracker.reduceTasks.containsKey(taskID))
+          task = JobTracker.reduceTasks.get(taskID);
+
+        if(task != null){
+
+        }
+      }
+    }
   }
+
 
   /**
    * Register a new tasktracker in this jobtracker
@@ -87,19 +103,86 @@ class JobTracker{
   }
 
 
+  def scheduleTask() = {
+    val result = new collection.mutable.HashMap[Integer, String]();
+    import collection.JavaConversions._;
+    val taskTrackers: collection.mutable.Map[String, TaskTrackerMeta] = JobTracker.tasktrackers;
+    for( (ttName, ttm) <- taskTrackers ){
+      ttm.synchronized{
+        if(ttm.getNumOfMapperSlots() > 0){
+          val slotNum = ttm.getNumOfMapperSlots();
+          var task = null;
+          for(i<- 0 until slotNum){
+            val task = this.getNextMapperTask();
+            if (task != null)
+              result.update(task.getTaskID(), ttm.getTaskTrackerName());
+          }
+        }
+
+
+        if(ttm.getNumOfReducerSlots() > 0){
+          val slotNum = ttm.getNumOfReducerSlots();
+          var task = null;
+          for(i<- 0 until slotNum){
+            val task = this.getNextReducerTask();
+            if (task != null)
+              result.update(task.getTaskID(), ttm.getTaskTrackerName());
+          }
+        }
+      }
+    }
+
+    result
+  }
+
+
   def getTaskTracker(id: String) = {
     if(JobTracker.tasktrackers.containsKey(id))
       JobTracker.tasktrackers.get(id);
     else null
   }
 
+
   def deleteTaskTracker(ttname: String){
     if(ttname != null && JobTracker.tasktrackers.containsKey(ttname)) 
       JobTracker.tasktrackers.remove(ttname);
   }
 
-  def updateTaskStatus(ttup: TaskTrackerUpdatePkg){
 
+  def updateTaskStatus(ttup: TaskTrackerUpdatePkg){
+    //TODO: fault tolerance is considered later.
+  }
+
+
+  def getNextMapperTask() = {
+    var retTask: TaskMeta = null;
+    while (!JobTracker.mapTasksQueue.isEmpty()) {
+      val task = JobTracker.mapTasksQueue.poll();
+      val job = JobTracker.jobs.get(task.getJobID());
+
+      if (job.getStatus() == JobMeta.JobStatus.FAILED) {
+        // this job has already failed
+        task.getTaskProgress().setStatus(TaskMeta.TaskStatus.FAILED);
+      } else 
+          retTask = task;
+    }
+    retTask
+  }
+
+
+  def getNextReducerTask() = {
+    var retTask: TaskMeta = null;
+    while (!JobTracker.reduceTasksQueue.isEmpty()) {
+      val task = JobTracker.reduceTasksQueue.poll();
+      val job = JobTracker.jobs.get(task.getJobID());
+
+      if (job.getStatus() == JobMeta.JobStatus.FAILED) {
+        // this job has already failed;
+        task.getTaskProgress().setStatus(TaskMeta.TaskStatus.FAILED);
+      } else 
+          retTask = task;
+    }
+    retTask
   }
 
 }
