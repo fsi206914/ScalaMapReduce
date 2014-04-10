@@ -16,7 +16,6 @@ object Config {
   val ClusterConfig = root.getConfig("ClusterConfig")
   val arrDouble = computeArrDouble()
 
-
   def computeArrDouble() = {
   	val dim = ClusterConfig.getInt("dim");
   	val splitNum = ClusterConfig.getInt("splitNum");

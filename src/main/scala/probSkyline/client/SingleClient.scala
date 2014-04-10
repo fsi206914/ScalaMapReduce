@@ -43,6 +43,7 @@ object SingleClient extends App{
 			oqClient.readMAXMIN();
 			oqClient.rule1();
 			oqClient.rule2();
+			oqClient.rule3();
 		}
 		else{
 			val splitNum = CC.getInt("splitNum");
