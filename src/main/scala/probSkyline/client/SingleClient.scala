@@ -23,6 +23,7 @@ object SingleClient extends App{
 	val argStr = args(1)
 
 	if(args(0) == "naive"){
+		println("The naive computing strategy: ");
 		if(argStr == "single"){
 			val nqClient = new NaiveQuery(CC.getString("testArea"))
 			nqClient.compProb(nqClient.getItemList)

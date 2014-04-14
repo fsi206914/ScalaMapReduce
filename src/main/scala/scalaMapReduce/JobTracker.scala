@@ -13,6 +13,7 @@ class JobTracker{
 
   def submitJob(newjob: JobMeta){
 
+
     newjob.splitInput();
     val blocks: List[JobMeta.InputBlock] = newjob.getInputBlocks();
     if(blocks == null || blocks.size() == 0)
@@ -58,7 +59,7 @@ class JobTracker{
     JobTracker.mapTasksQueue.addAll(mapTasks.values());
     JobTracker.reduceTasksQueue.addAll(reduceTasks.values());
     JobTracker.jobs.put(newjob.getJobId(), newjob);
-    newjob.setStatus(JobMeta.JobStatus.INPROGRESS)
+    newjob.setStatus(JobMeta.JobStatus.INPROGRESS);
   }
 	
 
@@ -67,24 +68,6 @@ class JobTracker{
     JobTracker.currentMaxTaskId-1
   }
 	
-
-  def distributeTasks(){
-    val schestrategies = this.scheduleTask();
-    if(schestrategies != null){
-      for( (taskID, ttmName) <- schestrategies ){
-        var task: TaskMeta = null;
-        if(JobTracker.mapTasks.containsKey(taskID))
-          task = JobTracker.mapTasks.get(taskID);
-        if(JobTracker.reduceTasks.containsKey(taskID))
-          task = JobTracker.reduceTasks.get(taskID);
-
-        if(task != null){
-
-        }
-      }
-    }
-  }
-
 
   /**
    * Register a new tasktracker in this jobtracker
@@ -185,6 +168,7 @@ class JobTracker{
     retTask
   }
 
+
 }
 
 
@@ -197,6 +181,7 @@ object JobTracker{
   val JOB_MAPPER_OUTPUT_PREFIX = "mapper_output_job_";
   val TASK_MAPPER_OUTPUT_PREFIX = "mapper_output_task_";
   val JOB_CLASSPATH_PREFIX = "job";
+  val JOB_CLASSPATH = "userpath";
   var currentMaxTaskId = (math.random*1000).toInt;
 
   def getTASK_MAPPER_OUTPUT_PREFIX() = TASK_MAPPER_OUTPUT_PREFIX;
@@ -220,4 +205,6 @@ object JobTracker{
 
   val tasktrackers = Collections.synchronizedMap(new HashMap[String, TaskTrackerMeta]());
   
+  def getJOB_CLASSPATH() = JobTracker.JOB_CLASSPATH;
+  def getJOB_CLASSPATH_PREFIX() = JobTracker.JOB_CLASSPATH_PREFIX;
 }

@@ -38,6 +38,9 @@ class JobSubmitterActor(jconf: JobConf) extends Actor {
 			context.become(started)
 		  remote ! "RequestJobID"
 
+		case "message" =>
+			println("JobSubmitterActor receive a message.")
+
 		case _ =>
 			println("JobSubmitterActor(BeforeStart) got something unexpected.")
 	}
@@ -57,7 +60,7 @@ class JobSubmitterActor(jconf: JobConf) extends Actor {
 
 			// 2. Send the job to the jobtracker.
 		  remote ! jconf
-			self ! "stop"
+//			self ! "stop"
 
 		case "stop" =>
 			println("stopping...")

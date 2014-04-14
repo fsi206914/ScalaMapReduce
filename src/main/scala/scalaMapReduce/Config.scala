@@ -28,15 +28,21 @@ object Config {
 		}
 		else if (dim == 3){
 			val arr = new ListBuffer[Double]();
-			for(i<-0 until 3) 
-				arr.append(math.Pi/3*(i+1)/2);	
+			// for(i<-0 until 3) 
+			// 	arr.append(math.Pi/3*(i+1)/2);	
+
+//			arr.append(0.9235);
+//			arr.append(1.04);
+			arr.append(1.57079);
 
 			retList.append(arr);
 
 			val arr2 = new ListBuffer[Double]();
-			for(i<-0 until splitNum/3 )
-				arr2.append(math.Pi/(splitNum/3)*(i+1)/2);	
+//			for(i<-0 until splitNum/3 )
+//				arr2.append(math.Pi/(splitNum/3)*(i+1)/2);	
 
+			arr2.append(0.7854);	
+			arr2.append(1.57079);	
 			retList.append(arr2);
 		}
 		retList

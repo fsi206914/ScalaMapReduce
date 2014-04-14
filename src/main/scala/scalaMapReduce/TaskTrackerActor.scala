@@ -16,7 +16,7 @@ object TaskTrackerApp extends App  {
     val ttName = args(0);
     val rPort = args(1).toInt;
     val system = ActorSystem("TaskTracker" + ttName + "System", Config.TaskTracker1Config)
-    val ttActor = system.actorOf(Props(new TaskTrackerActor(new TaskTracker("tt" + ttName, rPort))) , name = "TaskTracker"+ ttName)
+    val ttActor = system.actorOf(Props(new TaskTrackerActor(new TaskTracker("tt" + ttName, rPort))) , name = "TaskTrackerActor")
     ttActor ! Start
   }
 }
@@ -26,19 +26,25 @@ class TaskTrackerActor(val tt: TaskTracker) extends Actor {
 
   import context._
   val remote = context.actorSelection("akka.tcp://JobTrackerSystem@127.0.0.1:10021/user/JobTrackerActor")
+  
   def receive = {
 
     case Start =>
       println("TaskTrackerActor begin working")
       run();
-    case "RequestJobID" =>
+    case "RequestJobID" => 
       println("JobTracker received message RequestJobID")
       sender ! 123
     case taskInfo: TaskInfo => 
-      println("TaskTrackerActor received an object taskInfo");
+      println("TaskTrackerActor received an taskInfo");
       tt.runTask(taskInfo);
+    
+    case "message" =>
+      println("TaskTrackerActor receive a message.");
+    
     case _ => 
-      println("JobTracker got something unexpected.")
+      println("TaskTrackerActor got something unexpected.");
+
   }
 
 
@@ -50,7 +56,6 @@ class TaskTrackerActor(val tt: TaskTracker) extends Actor {
     import java.util.concurrent.TimeUnit;
 
     val taskStatusChecker = new Thread( new TaskStatusChecker(tt));
-
 
     taskStatusChecker.setDaemon(true);
     val schExec = Executors.newScheduledThreadPool(8);
@@ -89,7 +94,7 @@ class TaskTrackerActor(val tt: TaskTracker) extends Actor {
               val pkg = new TaskTrackerUpdatePkg(tt.taskTrackerName, TaskTracker.NUM_OF_MAPPER_SLOTS - tt.mapperCounter,
                         TaskTracker.NUM_OF_REDUCER_SLOTS - tt.reducerCounter, "12",
                         taskList, 123);
-              println("periodically sending taskStatusUpdater to taskTracker")
+//              println("periodically sending taskStatusUpdater to taskTracker")
               remote ! pkg;
             }
           }
@@ -98,8 +103,9 @@ class TaskTrackerActor(val tt: TaskTracker) extends Actor {
 
       });
       taskStatusUpdater.setDaemon(true);
-      val schFutureUpdater = schExec.scheduleAtFixedRate(taskStatusUpdater, 0,
-          2, TimeUnit.SECONDS);
+      taskStatusUpdater.start();
+      // val schFutureUpdater = schExec.scheduleAtFixedRate(taskStatusUpdater, 0,
+      //     2, TimeUnit.SECONDS);
   }
 
 }
