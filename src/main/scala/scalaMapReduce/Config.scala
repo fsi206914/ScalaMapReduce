@@ -5,17 +5,14 @@ import akka.actor._
 import com.typesafe.config._
 import scala.math;
 
-
 object Config {
   private val root = ConfigFactory.load()
   val JobTrackerConfig = root.getConfig("JobTrackerSystem")
   val JobSubmitterConfig = root.getConfig("JobSubmitterSystem")
   val TaskTracker1Config = root.getConfig("TaskTracker1System")
 
-
   val ClusterConfig = root.getConfig("ClusterConfig")
   val arrDouble = computeArrDouble()
-
 
   def computeArrDouble() = {
   	val dim = ClusterConfig.getInt("dim");
@@ -31,15 +28,21 @@ object Config {
 		}
 		else if (dim == 3){
 			val arr = new ListBuffer[Double]();
-			for(i<-0 until 3) 
-				arr.append(math.Pi/3*(i+1)/2);	
+			// for(i<-0 until 3) 
+			// 	arr.append(math.Pi/3*(i+1)/2);	
+
+			arr.append(0.8235);
+			arr.append(1.21);
+			arr.append(1.57079);
 
 			retList.append(arr);
 
 			val arr2 = new ListBuffer[Double]();
-			for(i<-0 until splitNum/3 )
-				arr2.append(math.Pi/(splitNum/3)*(i+1)/2);	
+//			for(i<-0 until splitNum/3 )
+//				arr2.append(math.Pi/(splitNum/3)*(i+1)/2);	
 
+			arr2.append(0.7854);	
+			arr2.append(1.57079);	
 			retList.append(arr2);
 		}
 		retList

@@ -23,6 +23,7 @@ object SingleClient extends App{
 	val argStr = args(1)
 
 	if(args(0) == "naive"){
+		println("The naive computing strategy: ");
 		if(argStr == "single"){
 			val nqClient = new NaiveQuery(CC.getString("testArea"))
 			nqClient.compProb(nqClient.getItemList)
@@ -30,9 +31,12 @@ object SingleClient extends App{
 		else{
 			val splitNum = CC.getInt("splitNum");
 			val nqClient = new NaiveQuery(CC.getString("testArea"))
+			
 			for(i<- 0 until splitNum){
 				nqClient.changeTestArea(i.toString)
+				time{ 
 				nqClient.compProb(nqClient.getItemList)
+				}
 			}
 		}
 	}
@@ -43,17 +47,24 @@ object SingleClient extends App{
 			oqClient.readMAXMIN();
 			oqClient.rule1();
 			oqClient.rule2();
+			oqClient.rule3();
 		}
 		else{
 			val splitNum = CC.getInt("splitNum");
 			for(i<- 0 until splitNum){
 				val iStr = i.toString();
-				val oqClient = new OptimizedQuery(iStr, OptimizedQuery.getItemMap(iStr) );
-				oqClient.readMAXMIN();
-				oqClient.rule1();
-				oqClient.rule2();
+				time{ 
+					val oqClient = new OptimizedQuery(iStr, OptimizedQuery.getItemMap(iStr) );
+					oqClient.readMAXMIN();
+					time{ 
+					oqClient.rule1();
+					oqClient.rule2();
+					}
+					oqClient.rule3();
+				}
 			}
 		}
+		println("---------------end of program.");
 	}
 
 	/**
@@ -68,4 +79,13 @@ object SingleClient extends App{
 			}
 		}
 	}
+
+	def time[R](block: => R): R = {
+		val t0 = System.nanoTime()
+		val result = block    // call-by-name
+		val t1 = System.nanoTime()
+		println("Elapsed time: " + (t1 - t0)/1000000 + "ms")
+		result
+	}
+
 }

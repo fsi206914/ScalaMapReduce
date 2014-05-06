@@ -90,7 +90,7 @@ class OptimizedQuery(var area: String, val itemMap: HashMap[Integer, Item]){
 	}
 
 	def removeAndGenerateNewList(){
-		println("before prune 1, the size of objects is " + itemMap.size);
+//		println("before prune 1, the size of objects is " + itemMap.size);
 		for( (objID, item) <- itemMap if item.potentialSkyline == true)
 			cleanItemMap += objID -> item;
 		println("after removing redundant items, the size decreases to " + cleanItemMap.size);
@@ -105,8 +105,15 @@ class OptimizedQuery(var area: String, val itemMap: HashMap[Integer, Item]){
 	}
 
 	def rule3(){
-
+		// val wrTree = new WRTree(cleanItemMap, area);
+		// wrTree.run();
+		
+		
+		/*
+		 * Currently we use naive query method to test.
+		 */
+		val naiveClient = new NaiveQuery("5")
+		naiveClient.compProb(cleanItemMap.values.toList)
 	}
-
 
 }

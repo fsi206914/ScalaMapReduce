@@ -8,12 +8,30 @@ import java.util.concurrent.TimeUnit;
 import java.net._
 import java.io._
 
+
+import scala.concurrent.Await
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
+import java.util.concurrent.TimeUnit;
+import scala.concurrent.Future
+
 class Job(val jc:JobConf){
 
 	def run(){
 	  implicit val system = ActorSystem("JobSubmitterSystem", Config.JobSubmitterConfig)
-	  val localActor = system.actorOf(Props(new JobSubmitterActor(jc)), name = "JobSubmitterActor") 
+	  val localActor = system.actorOf(Props(new JobSubmitterActor(jc)), name = "JobSubmitterActor")
 		localActor ! Start
+
+		// test future actor.
+
+		// implicit val timeout = Timeout(5, TimeUnit.SECONDS);
+		// //val future = localActor ? "try"// enabled by the “ask” import
+		// //val result = Await.result(future, timeout.duration).asInstanceOf[String]
+		// //println("result = " + result);
+
+		// val future: Future[String] = ask(localActor, "try").mapTo[String]
+		// println("non block = " + future);
 	}
 }
 
@@ -38,6 +56,13 @@ class JobSubmitterActor(jconf: JobConf) extends Actor {
 			context.become(started)
 		  remote ! "RequestJobID"
 
+		case "message" =>
+			println("JobSubmitterActor receive a message.")
+
+		case "try" =>
+			println("try......")
+			sender ! "asdf"
+
 		case _ =>
 			println("JobSubmitterActor(BeforeStart) got something unexpected.")
 	}
@@ -57,7 +82,12 @@ class JobSubmitterActor(jconf: JobConf) extends Actor {
 
 			// 2. Send the job to the jobtracker.
 		  remote ! jconf
-			self ! "stop"
+//			self ! "stop"
+
+
+		case "try" =>
+			println("stopping...")
+			sender !""
 
 		case "stop" =>
 			println("stopping...")
