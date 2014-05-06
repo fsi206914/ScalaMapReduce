@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * 
  * This class is used to run mapper tasks or reducer task
@@ -34,6 +35,7 @@ public abstract class Worker {
   /* the progress of the task, including percentage, failed, succeed, or in progress etc */
   protected TaskProgress progress;
 
+  protected String taskTrackerServiceName;
   /**
    * constructor method
    * 
@@ -50,23 +52,23 @@ public abstract class Worker {
     this.outputFile = outfile;
     this.inputFile = infile;
     this.progress = new TaskProgress(this.taskID, type);
-
+    this.taskTrackerServiceName = taskTrackerServiceName;
     /* get the task tracker status updater from rmi */
     String registryHostName = null;
-    try {
-      registryHostName = InetAddress.getLocalHost().getHostName();
-    } catch (UnknownHostException e1) {
-      e1.printStackTrace();
-    }
+    // try {
+    //   registryHostName = InetAddress.getLocalHost().getHostName();
+    // } catch (UnknownHostException e1) {
+    //   e1.printStackTrace();
+    // }
 
-    try {
-      Registry reg = LocateRegistry.getRegistry(registryHostName, rPort);
-      taskStatusUpdater = (StatusUpdater) reg.lookup(taskTrackerServiceName);
-    } catch (RemoteException e) {
-      e.printStackTrace();
-    } catch (NotBoundException e) {
-      e.printStackTrace();
-    }
+    // try {
+    //   Registry reg = LocateRegistry.getRegistry(registryHostName, rPort);
+    //   taskStatusUpdater = (StatusUpdater) reg.lookup(taskTrackerServiceName);
+    // } catch (RemoteException e) {
+    //   e.printStackTrace();
+    // } catch (NotBoundException e) {
+    //   e.printStackTrace();
+    // }
 
   }
 
@@ -79,17 +81,17 @@ public abstract class Worker {
    * periodically update task status to task tracker
    */
   public void updateStatusToTaskTracker() {
-    /* periodically send status progress to task tracker */
-    int poolSize = Integer.parseInt(Utility.getParam("THREAD_POOL_SIZE"));
-    ScheduledExecutorService schExec = Executors.newScheduledThreadPool(poolSize);
-    Thread thread = new Thread(new Runnable() {
-      public void run() {
-        updateStatus();
-      }
-    });
-    thread.setDaemon(true);
-    schExec.scheduleAtFixedRate(thread, 0, Integer.parseInt(Utility.getParam("HEART_BEAT_PERIOD")),
-            TimeUnit.SECONDS);
+    // /* periodically send status progress to task tracker */
+    // int poolSize = Integer.parseInt(Utility.getParam("THREAD_POOL_SIZE"));
+    // ScheduledExecutorService schExec = Executors.newScheduledThreadPool(poolSize);
+    // Thread thread = new Thread(new Runnable() {
+    //   public void run() {
+    //     updateStatus();
+    //   }
+    // });
+    // thread.setDaemon(true);
+    // schExec.scheduleAtFixedRate(thread, 0, Integer.parseInt(Utility.getParam("HEART_BEAT_PERIOD")),
+    //         TimeUnit.SECONDS);
   }
 
   /**
@@ -111,9 +113,9 @@ public abstract class Worker {
           progress.setTimestamp(System.currentTimeMillis());
 
           /* update to task tracker */
-          taskStatusUpdater.update(progress);
+//          taskStatusUpdater.update(progress);
 
-        } catch (RemoteException e) {
+        } catch (Exception e) {
           e.printStackTrace();
         }
       }
@@ -123,7 +125,7 @@ public abstract class Worker {
   /**
    * update succeed status to task tracker only used when the task is done
    */
-  public void updateStatusSucceed() {
+  public TaskProgress updateStatusSucceed() {
     /* lock progress before change it */
     synchronized (progress) {
       try {
@@ -137,11 +139,13 @@ public abstract class Worker {
         progress.setTimestamp(System.currentTimeMillis());
 
         /* update to task tracker */
-        taskStatusUpdater.update(progress);
-      } catch (RemoteException e) {
+//        taskStatusUpdater.update(progress);
+
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }
+    return progress;
   }
 
   /**

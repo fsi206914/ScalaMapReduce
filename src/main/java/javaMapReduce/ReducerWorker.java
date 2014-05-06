@@ -324,10 +324,8 @@ public class ReducerWorker extends Worker {
 		int taskID = Integer.parseInt(args[0]);
 
 		try {
-			PrintStream out = new PrintStream(new FileOutputStream(new File(
-							Utility.getParam("REDUCER_STANDARD_OUT_REDIRECT") + taskID)));
-			PrintStream err = new PrintStream(new FileOutputStream(new File(
-							Utility.getParam("REDUCER_STANDARD_ERR_REDIRECT") + taskID)));
+			PrintStream out = new PrintStream(new FileOutputStream("./tmp/reduceout" + args[0]));
+			PrintStream err = new PrintStream(new FileOutputStream("./tmp/reduceerr" + args[0]));
 			System.setErr(err);
 			System.setOut(out);
 		} catch (FileNotFoundException e) {

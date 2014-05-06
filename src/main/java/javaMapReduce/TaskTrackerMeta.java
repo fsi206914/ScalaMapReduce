@@ -6,7 +6,7 @@ import java.io.Serializable;
 public class TaskTrackerMeta implements Serializable{
 	// the time period of how long at least the slave
 	// should send a heartbeat to keep it alive
-	private final int ALIVE_CYCLE; // 8 seconds
+	private final int ALIVE_CYCLE = 8000; // 8 seconds
 
 	// the unique name of task tracker
 	private String taskTrackerName;
@@ -32,7 +32,6 @@ public class TaskTrackerMeta implements Serializable{
 		this.tasks = new HashSet<Integer>();
 		this.numOfMapperSlots = 0;
 		this.numOfReducerSlots = 0;
-		this.ALIVE_CYCLE = Integer.parseInt(Utility.getParam("ALIVE_CYCLE"));
 	}
 
 	public TaskLauncher getTaskLauncher() {
