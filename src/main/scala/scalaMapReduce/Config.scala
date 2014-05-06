@@ -31,8 +31,8 @@ object Config {
 			// for(i<-0 until 3) 
 			// 	arr.append(math.Pi/3*(i+1)/2);	
 
-//			arr.append(0.9235);
-//			arr.append(1.04);
+			arr.append(0.8235);
+			arr.append(1.21);
 			arr.append(1.57079);
 
 			retList.append(arr);

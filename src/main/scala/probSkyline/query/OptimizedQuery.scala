@@ -105,8 +105,15 @@ class OptimizedQuery(var area: String, val itemMap: HashMap[Integer, Item]){
 	}
 
 	def rule3(){
-		val wrTree = new WRTree(cleanItemMap, area);
-		wrTree.run();
+		// val wrTree = new WRTree(cleanItemMap, area);
+		// wrTree.run();
+		
+		
+		/*
+		 * Currently we use naive query method to test.
+		 */
+		val naiveClient = new NaiveQuery("5")
+		naiveClient.compProb(cleanItemMap.values.toList)
 	}
 
 }

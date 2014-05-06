@@ -57,7 +57,8 @@ class JobTrackerActor(val jt: JobTracker) extends Actor with ActorLogging{
     if (!Utility.extractJobClassJar(jconf.getJobID(), jconf.getJarFilePath())) {
       System.out.println("Extracting jar file error.");
     }
-
+    Utility.getSystemTempDir();
+    
     val newJob = new JobMeta(jconf);
     jt.submitJob(newJob);
     distributeTasks();
