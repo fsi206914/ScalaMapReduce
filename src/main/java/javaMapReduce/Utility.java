@@ -75,10 +75,12 @@ public class Utility {
 		String separator = System.getProperty("file.separator");
 		String classpath = System.getProperty("java.class.path");
 		String path = System.getProperty("java.home") + separator + "bin" + separator + "java";
+		// String path = "scala";
 		String[] newargs = new String[args.length + 3]; /* three more args for path, -cp, classpath */
 		newargs[0] = path;
 		newargs[1] = "-cp";
 		newargs[2] = "userpath" + separator + "job" + jid + separator;
+		newargs[2] += ":./lib/scala-library-2.10.3.jar:./lib/typesafe-config.jar:./lib/akka-actors.jar:./lib/akka-remote.jar";
 
 		for (int i = 3, j = 0; j < args.length; i++, j++) {
 			newargs[i] = args[j];
