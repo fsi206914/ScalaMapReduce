@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import scalaMapReduce.TaskUpdater;
 
 public class MapperWorker extends Worker {
 
@@ -104,7 +105,10 @@ public class MapperWorker extends Worker {
     /* do cleanup */
     mapper.cleanup();
     /* report to task tracker that this task is done */
-    this.updateStatusSucceed();
+    TaskProgress tp = this.updateStatusSucceed();
+    TaskUpdater tu = new TaskUpdater(tp, taskTrackerServiceName);
+    tu.run();
+
     /* shut down jvm */
     System.exit(0);
   }
@@ -188,12 +192,11 @@ public class MapperWorker extends Worker {
     if (args.length != 11) {
       System.out.println("Illegal arguments");
     }
+
     int taskID = Integer.parseInt(args[0]);
     try {
-      PrintStream out = new PrintStream(new FileOutputStream(new File(
-              Utility.getParam("MAPPER_STANDARD_OUT_REDIRECT") + taskID)));
-      PrintStream err = new PrintStream(new FileOutputStream(new File(
-              Utility.getParam("MAPPER_STANDARD_ERR_REDIRECT") + taskID)));
+      PrintStream out = new PrintStream(new FileOutputStream("./tmp/mapout" + args[0]));
+      PrintStream err = new PrintStream(new FileOutputStream("./tmp/maperr" + args[0]));
       System.setErr(err);
       System.setOut(out);
     } catch (FileNotFoundException e) {

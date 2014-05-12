@@ -14,7 +14,7 @@ class TaskUpdater(val progress:TaskProgress, val name: String){
 		val system = ActorSystem("TaskUpdaterSystem" + name);
  		val tuActor = system.actorOf(Props(new TaskUpdateActor(1)) , name = "TaskUpdateActor")
 		tuActor ! Start
-		tuActor ! progress
+		tuActor ! "message"
 	}
 }
 
@@ -30,16 +30,18 @@ class TaskUpdateActor(taskID: Int) extends Actor {
 	def transmit: Receive = {
 
 		case Start =>
-			println("JobSubmitter started working...")
+			println("TaskUpdater started working...")
 
 		case "message" =>
-			println("JobSubmitterActor receive a message.")
-
+			println("TaskUpdater receive a message.")
+			remote ! "message";
+			
 		case prog: TaskProgress =>
+			println("TaskUpdateActor received a taskProgress.")
 			remote ! prog;
 
 		case _ =>
-			println("JobSubmitterActor(BeforeStart) got something unexpected.")
+			println("TaskUpdater (BeforeStart) got something unexpected.")
 	}
 
 	def printActor(s: ActorRef){
@@ -49,4 +51,9 @@ class TaskUpdateActor(taskID: Int) extends Actor {
 		println(s.path.address.port)
 	}
 
+}
+
+object TaskApp extends App {
+
+   new TaskUpdater(null, "szf").run();
 }
